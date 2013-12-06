@@ -69,6 +69,15 @@ namespace roboptim{
     }
     
     void appendMatrixTo( Function::matrix_t& A, Function::vector_t& b, Eigen::MatrixXd& Ae, Eigen::VectorXd& be ){
+        Function::size_type n, pA, pAe;
+
+        n = A.rows();
+        pA = A.cols();
+        pAe = Ae.cols();
+
+        Eigen::MatrixXd resultMatrix(n, pA+pAe);
+        resultMatrix << Ae, A;
+
         return;
     }
 
