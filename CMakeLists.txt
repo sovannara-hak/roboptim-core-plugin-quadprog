@@ -11,6 +11,8 @@ SET(PROJECT_NAME roboptim-core-plugin-quadprog)
 SET(PROJECT_DESCRIPTION "RobOptim core Quadprog++ plug-in")
 SET(PROJECT_URL "http://github.com/sovannara-hak/roboptim-core-plugin-quadprog")
 
+SET(CXX_DISABLE_WERROR 1)
+
 SET(PKG_CONFIG_ADDITIONAL_VARIABLES plugindir ${PKG_CONFIG_ADDITIONAL_VARIABLES})
 SETUP_PROJECT()
 
