@@ -32,6 +32,12 @@ namespace roboptim{
             Eigen::MatrixXd CI_;
             Eigen::VectorXd ci0_;
 
+            /// \brief Append the columns of a matrix_t at the end of an Eigen::MatrixXd (resp. vector_t, Eigen::VectorXd)
+            /// 
+            /// \param A The input matrix_t
+            /// \param b the input vector_t
+            /// \param Ae The output Eigen::MatrixXd
+            /// \param be the output Eigen::VectorXd
             void appendMatrixTo(Function::matrix_t& A, Function::vector_t& b, Eigen::MatrixXd& Ae, Eigen::VectorXd& be);
 
     };
