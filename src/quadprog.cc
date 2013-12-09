@@ -94,7 +94,7 @@ namespace roboptim{
                 xsol);
 
         if( cost == std::numeric_limits<double>::infinity() )
-            result_ = SolverError( "Solution is not found." );    
+            result_ = SolverError( "Solution cannot be found." );    
         else{
             Result res( n_, 1 );
             res.x.resize( n_ );
