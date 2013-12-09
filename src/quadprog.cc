@@ -6,15 +6,18 @@
 
 #include <roboptim/core.hh>
 #include "roboptim/core/plugin/quadprog/quadprog.hh"
+#include <quadprog/QuadProg++.h>
 
 namespace roboptim{
     QuadprogSolver::QuadprogSolver (const problem_t& pb) throw ()
         : parent_t (pb){
 
-            Function::size_type n = pb.function().inputSize();
-            G_.resize(n, n);
-            g0_.resize(n);
+            n_ = pb.function().inputSize();
+            G_.resize(n_, n_);
+            g0_.resize(n_);
 
+            G_ = this->problem().function().A();
+            g0_ = this->problem().function().b();
             //Function::size_type p = 0;
 
             //Checking if the added constraint is an equality or inequality
@@ -54,15 +57,8 @@ namespace roboptim{
                 if(c_it != pb.constraints().end ())
                     ++c_it;
             }
-            
-            parameters_["dummy-parameter"].description = "dummy parameter";
-            parameters_["dummy-parameter"].value = 42.;
 
-            parameters_["dummy-parameter2"].description = "yet another dummy parameter";
-            parameters_["dummy-parameter2"].value = 3;
-
-            parameters_["dummy-parameter3"].description = "just a dummy key";
-            parameters_["dummy-parameter3"].value = "...and a dummy value!";
+            // Matrices are now compatible with quadprog
     }
 
     QuadprogSolver::~QuadprogSolver () throw (){
@@ -90,7 +86,23 @@ namespace roboptim{
     }
 
     void QuadprogSolver::solve() throw (){
-        result_ = SolverError ("The dummy solver always fail.");    
+        // We can solve
+        Eigen::VectorXd xsol(n_);
+        double cost;
+        cost = QuadProgPP::solve_quadprog(G_, g0_,
+                CE_, ce0_, CI_, ci0_,
+                xsol);
+
+        if( cost == std::numeric_limits<double>::infinity() )
+            result_ = SolverError( "Solution is not found." );    
+        else{
+            Result res( n_, 1 );
+            res.x.resize( n_ );
+            res.x = xsol;
+            res.value(0) = cost;
+            res.constraints.resize( ce0_.size() + ci0_.size() );
+            result_ = res;
+        }
     }
 }
 

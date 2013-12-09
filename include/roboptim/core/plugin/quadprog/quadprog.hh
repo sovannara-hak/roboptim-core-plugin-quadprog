@@ -14,7 +14,7 @@ namespace roboptim{
         : public Solver< NumericQuadraticFunction, boost::mpl::vector<LinearFunction> > {
         public:
             typedef Solver<NumericQuadraticFunction, boost::mpl::vector<LinearFunction> > parent_t;
-
+            typedef parent_t::result_t result_t;
             explicit QuadprogSolver (const problem_t& problem) throw ();
             virtual ~QuadprogSolver () throw ();
             virtual void solve () throw ();
@@ -31,6 +31,8 @@ namespace roboptim{
 
             Eigen::MatrixXd CI_;
             Eigen::VectorXd ci0_;
+
+            Function::size_type n_;
 
             /// \brief Append the columns of a matrix_t at the end of an Eigen::MatrixXd (resp. vector_t, Eigen::VectorXd)
             /// 
