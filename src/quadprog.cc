@@ -75,8 +75,16 @@ namespace roboptim{
         pA = A.cols();
         pAe = Ae.cols();
 
-        Eigen::MatrixXd resultMatrix(n, pA+pAe);
+        //Concatenate Ae and A
+        Eigen::MatrixXd resultMatrix(n, pAe+pA);
         resultMatrix << Ae, A;
+
+        //Concatenate b and be
+        Eigen::VectorXd resultVector(pAe+pA);
+        resultVector << be,b;
+
+        Ae = resultMatrix;
+        be = resultVector;
 
         return;
     }
