@@ -27,6 +27,7 @@ namespace roboptim{
             typedef typename parent_t::problem_t::constraints_t::const_iterator c_citer_t;
             c_citer_t c_it = pb.constraints().begin();
             //for each constraints
+            /*
             for (citerVect_t it = pb.boundsVector ().begin ();
                     it != pb.boundsVector ().end (); ++it){
                 bool equality = true;
@@ -57,7 +58,22 @@ namespace roboptim{
                 if(c_it != pb.constraints().end ())
                     ++c_it;
             }
+            */
 
+            // Check if CE or CI is empty
+            if( CE_.size() == 0){
+                CE_ = Eigen::MatrixXd::Zero(0, n_);
+                ce0_ = Eigen::VectorXd::Zero(0);
+            }
+
+            if( CI_.size() == 0){
+                CI_ = Eigen::MatrixXd::Zero(0, n_);
+                ci0_ = Eigen::VectorXd::Zero(0);
+            }
+
+            std::cout << "Size G_ " << G_.size() << " " << g0_.size() << std::endl;
+            std::cout << "Size CE_ " << CE_.size() << " " << ce0_.size() << std::endl;
+            std::cout << "Size CI_ " << CI_.size() << " " << ci0_.size() << std::endl;
             // Matrices are now compatible with quadprog
     }
 
@@ -67,9 +83,9 @@ namespace roboptim{
     void appendMatrixTo( Function::matrix_t& A, Function::vector_t& b, Eigen::MatrixXd& Ae, Eigen::VectorXd& be ){
         Function::size_type n, pA, pAe;
 
-        n = A.rows();
-        pA = A.cols();
-        pAe = Ae.cols();
+        n = A.cols();
+        pA = A.rows();
+        pAe = Ae.rows();
 
         //Concatenate Ae and A
         Eigen::MatrixXd resultMatrix(n, pAe+pA);
