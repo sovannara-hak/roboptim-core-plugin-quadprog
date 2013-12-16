@@ -14,6 +14,7 @@ namespace roboptim{
         : public Solver< NumericQuadraticFunction, boost::mpl::vector<LinearFunction> > {
         public:
             typedef Solver<NumericQuadraticFunction, boost::mpl::vector<LinearFunction> > parent_t;
+            typedef parent_t solver_t;
             typedef parent_t::result_t result_t;
             explicit QuadprogSolver (const problem_t& problem) throw ();
             virtual ~QuadprogSolver () throw ();

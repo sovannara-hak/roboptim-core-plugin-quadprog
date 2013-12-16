@@ -27,7 +27,6 @@ namespace roboptim{
             typedef typename parent_t::problem_t::constraints_t::const_iterator c_citer_t;
             c_citer_t c_it = pb.constraints().begin();
             //for each constraints
-            /*
             for (citerVect_t it = pb.boundsVector ().begin ();
                     it != pb.boundsVector ().end (); ++it){
                 bool equality = true;
@@ -42,23 +41,23 @@ namespace roboptim{
                 }
 
                 //Get A and b for each constraints
-                boost::shared_ptr<NumericLinearFunction> constraint_function;
-                constraint_function = boost::get<boost::shared_ptr<NumericLinearFunction> > (*c_it);
+                boost::shared_ptr<GenericLinearFunction<roboptim::EigenMatrixDense> > constraint_function = 
+                    boost::get<boost::shared_ptr<
+                    GenericLinearFunction<roboptim::EigenMatrixDense> > > (*c_it);
                 //If constraint is equality, append coefficient in CE_ and ce0_
                 if( equality )
-                    appendMatrixTo(constraint_function->A(),
-                                   constraint_function->b(),
+                    appendMatrixTo(boost::static_pointer_cast<NumericLinearFunction>(constraint_function)->A(),
+                                   boost::static_pointer_cast<NumericLinearFunction>(constraint_function)->b(),
                                    CE_, ce0_);
                 else
                 //If constraint is inequality, append in CI_, ci0_
-                    appendMatrixTo(constraint_function->A(),
-                                   constraint_function->b(),
+                    appendMatrixTo(boost::static_pointer_cast<NumericLinearFunction>(constraint_function)->A(),
+                                   boost::static_pointer_cast<NumericLinearFunction>(constraint_function)->b(),
                                    CI_, ci0_);
                     
                 if(c_it != pb.constraints().end ())
                     ++c_it;
             }
-            */
 
             // Check if CE or CI is empty
             if( CE_.size() == 0){
@@ -80,24 +79,39 @@ namespace roboptim{
     QuadprogSolver::~QuadprogSolver () throw (){
     }
     
-    void appendMatrixTo( Function::matrix_t& A, Function::vector_t& b, Eigen::MatrixXd& Ae, Eigen::VectorXd& be ){
+    void QuadprogSolver::appendMatrixTo( Function::matrix_t& A, Function::vector_t& b, Eigen::MatrixXd& Ae, Eigen::VectorXd& be ){
         Function::size_type n, pA, pAe;
 
         n = A.cols();
         pA = A.rows();
         pAe = Ae.rows();
 
+        std::cout << "SizeA Ae " << A.cols() << " " << Ae.cols() << std::endl;
+        
+        Eigen::MatrixXd resultMatrix;
+        Eigen::VectorXd resultVector;
+        
         //Concatenate Ae and A
-        Eigen::MatrixXd resultMatrix(n, pAe+pA);
-        resultMatrix << Ae, A;
-
+        if( Ae.rows() == 0 ){
+            resultMatrix = A;
+        }
+        else{
+            resultMatrix(n, pAe+pA);
+            resultMatrix << Ae, A;
+        }
+               
         //Concatenate b and be
-        Eigen::VectorXd resultVector(pAe+pA);
-        resultVector << be,b;
+        if( be.size() == 0 ){
+            resultVector = b;
+
+        }
+        else{
+            resultVector(pAe+pA);
+            resultVector << be,b;
+        }
 
         Ae = resultMatrix;
         be = resultVector;
-
         return;
     }
 
