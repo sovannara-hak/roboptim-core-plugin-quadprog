@@ -8,6 +8,7 @@ typedef roboptim::QuadprogSolver::solver_t solver_t;
 int main()
 {
     //Definition of the quadratic function
+    //1/2 (2x1^2 + x1x2 + x2^2)
     roboptim::Function::matrix_t A( 2,2 );
     roboptim::Function::vector_t b( 2 );
     A << 2,0.5,0.5,1;
@@ -23,13 +24,22 @@ int main()
     boost::shared_ptr< roboptim::NumericLinearFunction > c1(
             new roboptim::NumericLinearFunction( Ac1, bc1 ) );
 
-    //Definition of another constraint 0 < x < +infinity
+    //Definition of another constraint 0 < x1 < +infinity
     roboptim::Function::matrix_t Ac2( 2,2 );
     roboptim::Function::vector_t bc2( 2 );
-    Ac2 << 1,0,0,1;
+    Ac2 << 1,0,0,0;
     bc2 << 0,0;
     boost::shared_ptr< roboptim::NumericLinearFunction > c2(
             new roboptim::NumericLinearFunction(Ac2, bc2) );
+
+    //Definition of another constraint: 
+    roboptim::Function::matrix_t Ac3( 2,2 );
+    roboptim::Function::vector_t bc3( 2 );
+    Ac3 << 0,0,0,1;
+    bc3 << 0,0;
+    boost::shared_ptr< roboptim::NumericLinearFunction > c3(
+            new roboptim::NumericLinearFunction(Ac3, bc3) );
+
     
     //Creation of the problem
     solver_t::problem_t pb ( f );
@@ -56,6 +66,13 @@ int main()
         roboptim::Function::interval_t c2_interval = roboptim::Function::makeLowerInterval( 0 );
         c2_bounds.push_back(c2_interval);
     }
+
+    //Set bounds for c3
+    roboptim::Function::intervals_t c3_bounds;
+    for( unsigned int i=0; i< pb.function().inputSize(); ++i ){
+        roboptim::Function::interval_t c3_interval = roboptim::Function::makeLowerInterval( 0 );
+        c3_bounds.push_back(c3_interval);
+    }
       
     //Set scales for the problem
     solver_t::problem_t::scales_t scales_c1(1, 1.0);
@@ -73,9 +90,15 @@ int main()
             boost::static_pointer_cast<
       roboptim::GenericLinearFunction<roboptim::EigenMatrixDense> >
             (c2), c2_bounds, scales_c2);
-    boost::shared_ptr<roboptim::GenericLinearFunction<roboptim::EigenMatrixDense> > c3 =
-        boost::get< boost::shared_ptr<roboptim::GenericLinearFunction<roboptim::EigenMatrixDense> > > 
-    (*pb.constraints().begin());  
+
+    pb.addConstraint(
+            boost::static_pointer_cast<
+      roboptim::GenericLinearFunction<roboptim::EigenMatrixDense> >
+            (c3), c3_bounds, scales_c2);
+
+    //boost::shared_ptr<roboptim::GenericLinearFunction<roboptim::EigenMatrixDense> > c3 =
+    //    boost::get< boost::shared_ptr<roboptim::GenericLinearFunction<roboptim::EigenMatrixDense> > > 
+    //(*pb.constraints().begin());  
     //std::cout << boost::static_pointer_cast<roboptim::NumericLinearFunction> (c3)->A() << std::endl;
       
     //Set initial guess
