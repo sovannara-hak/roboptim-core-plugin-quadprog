@@ -9,19 +9,13 @@ ADD_EXECUTABLE(testquadprogPlugin
     quadprogPlugin.cpp
 )
 
-# Set plugin path of roboptim-core from the .pc file
-EXECUTE_PROCESS(
-    COMMAND "${PKG_CONFIG_EXECUTABLE}"
-    "--variable=plugindir" "roboptim-core"
-    OUTPUT_VARIABLE "PC_ROBOPTIM-CORE_PLUGINDIR"
-    ERROR_QUIET
-)
-STRING(REPLACE "\n" "" "PC_ROBOPTIM-CORE_PLUGINDIR" "${PC_ROBOPTIM-CORE_PLUGINDIR}")
+# Set plugin path of roboptim-core 
+SET(PLUGIN_PATH "${CMAKE_BINARY_DIR}/src")
 
 SET_TARGET_PROPERTIES(
     testquadprogPlugin
     PROPERTIES COMPILE_FLAGS
-    "-DPLUGIN_PATH='\"${PC_ROBOPTIM-CORE_PLUGINDIR}\"'"
+    "-DPLUGIN_PATH='\"${PLUGIN_PATH}\"'"
 )
 
 PKG_CONFIG_USE_DEPENDENCY(testquadprog quadprog)
