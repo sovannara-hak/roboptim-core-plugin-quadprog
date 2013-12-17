@@ -96,7 +96,7 @@ namespace roboptim{
             resultMatrix = A;
         }
         else{
-            resultMatrix(n, pAe+pA);
+            resultMatrix.resize(pA+pAe, n);
             resultMatrix << Ae, A;
         }
                
@@ -106,7 +106,7 @@ namespace roboptim{
 
         }
         else{
-            resultVector(pAe+pA);
+            resultVector.resize(pAe+pA);
             resultVector << be,b;
         }
 
